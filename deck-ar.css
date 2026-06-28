@@ -1,0 +1,97 @@
+/* =========================================================================
+   Les Perles de Zenata — DECK ARABE (darija, RTL)
+   Surcharge de deck.css : polices arabes + bascule droite→gauche.
+   Le deck FR (deck.css) reste intact. Les slides AR lient CE fichier seul.
+   ========================================================================= */
+
+@import url('deck.css');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap');
+
+:root{
+  --font-title:'Amiri', 'Cormorant Garamond', Georgia, serif;
+  --font-body:'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+}
+
+/* ---------- Base RTL ---------- */
+html{direction:rtl}
+body{text-align:right}
+
+/* l'arabe n'a pas de casse ni de chasse étendue : le letter-spacing
+   CASSE les lettres jointes et l'uppercase est inopérant → on neutralise. */
+.eyebrow{letter-spacing:0;text-transform:none;font-family:var(--font-body)}
+.brandbar .sig,.brandbar .num,.sig-mini,.snum,.fact-lbl,
+.cz--stats .st-lbl,.cz-sig,.fullbleed-text .sig-light,.price-line{letter-spacing:0}
+.title-panel .price-line{text-transform:none}
+
+/* hauteur de ligne un poil plus généreuse (diacritiques arabes) */
+h1,.h1{line-height:1.2}
+h2,.h2{line-height:1.3}
+.body{line-height:1.85}
+.promise-cartouche,.facts-subtitle,.fullbleed-subtitle,.promise-sub{line-height:1.5}
+
+/* Amiri italique pour les accents « pensée » (sous-titres or) reste lisible :
+   on garde l'italique mais Amiri gère le style. */
+
+/* ---------- Bascule des ancrages absolus (miroir gauche↔droite) ---------- */
+
+/* filets or verticaux : passaient à gauche du média → à droite en RTL */
+.split-media::before,
+.promise-media::before,
+.facts-panel::before{left:auto;right:0}
+.title-photo::before{left:auto;right:0}
+
+/* n° de slide : bas-droite → bas-gauche */
+.snum{right:auto;left:22px}
+
+/* signature mini : gauche → droite */
+.sig-mini{left:auto;right:54px}
+
+/* barre de marque : déjà left/right:56px (symétrique) → on inverse l'alignement interne via dir, rien à faire */
+
+/* mention légale média (par défaut left:18px) → droite */
+.promise-media .legal{left:auto;right:18px}
+.cz .legal{left:auto;right:14px}
+
+/* ---------- Slide titre (couverture) ---------- */
+/* le flex s'inverse seul : panneau crème passe à droite, photo à gauche.
+   le filet or de .title-photo est déjà remis à droite ci-dessus. */
+
+/* ---------- Slide fullbleed (magasins / promesse 7) ---------- */
+/* texte calé à gauche en FR → à droite en RTL */
+.fullbleed-text{left:auto;right:60px}
+.fullbleed-scrim{
+  background:linear-gradient(265deg,rgba(20,32,26,.86) 0%,rgba(20,32,26,.62) 36%,rgba(20,32,26,.10) 66%,rgba(20,32,26,0) 100%)}
+.fullbleed-watermark{right:auto;left:46px}
+.slide--fullbleed .legal{right:auto;left:18px}
+/* le snum des slides fullbleed est forcé inline en FR (left:22px) → on rebascule à droite */
+.slide--fullbleed .snum{left:auto;right:22px}
+
+/* ---------- Carte localisation : labels des pins ---------- */
+/* les ancrages lbl-left / lbl-right doivent s'inverser pour rester lisibles */
+.pin--m.lbl-right .lbl{left:auto;right:56px}
+.pin--m.lbl-left  .lbl{right:auto;left:56px}
+
+/* ---------- Listes à puces (promesse 3) ---------- */
+/* puce losange passait à gauche (padding-left) → à droite */
+.promise-list li{padding-left:0;padding-right:20px}
+.promise-list li::before{left:auto;right:0}
+
+/* chips proximité : restent en flex-wrap, alignées à droite via dir */
+
+/* ---------- Promesse 4 : collage chantier (czcap / czpt / cz-src) ---------- */
+.cz .czcap{left:auto;right:0;letter-spacing:0;border-top-right-radius:0;border-top-left-radius:3px}
+.cz--stats .czpt-s,.cz--note .czpt-s{letter-spacing:0}
+.cz--title .cz-src{letter-spacing:0}
+/* variante cellule-titre fond vert (symétrie collage) */
+.cz--title.cz--green{background:var(--ink)}
+.cz--title.cz--green h2{color:#FBF8F2}
+.cz--title.cz--green .facts-subtitle{color:#EBDABB}
+.cz--title.cz--green .cz-sig{color:#C2CCC4}
+.cz--title.cz--green .cz-src{color:#90A096}
+/* (ancien gabarit triptyque conservé pour compat) */
+.promise-triptych::before{left:auto;right:0}
+.promise-triptych figcaption{left:auto;right:0;letter-spacing:0}
+.promise-triptych .src-note{right:auto;left:14px;letter-spacing:0}
+
+/* ---------- Promesse 5 : bande de pictos sécurité ---------- */
+.promise-pictos figcaption{letter-spacing:0}

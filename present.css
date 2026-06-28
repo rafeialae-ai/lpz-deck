@@ -1,0 +1,236 @@
+/* =========================================================================
+   Les Perles de Zenata — COUCHE PRÉSENTATION TV (animée, plein écran)
+   Posée PAR-DESSUS deck.css / deck-ar.css. N'altère ni le markup des slides,
+   ni l'impression : TOUT est sous @media screen.
+   v2 — chorégraphie cinématique : révélations au masque (clip), count-up des
+   chiffres, balayage de révélation + Ken Burns marqué, reflet doré, filets
+   qui se tracent, cartouche à rebond. Élégant mais bien vivant.
+   ========================================================================= */
+
+@media screen {
+
+  html, body { height:100%; margin:0; background:#0d130f; overflow:hidden; }
+  body.ui-hide { cursor:none; }
+
+  /* --- scène plein écran (reçoit le letterbox) --- */
+  .stage {
+    position:fixed; inset:0; overflow:hidden;
+    background:radial-gradient(120% 120% at 50% 40%, #16201a 0%, #0b100d 100%);
+  }
+
+  /* --- le deck : boîte 1280×720 centrée, mise à l'échelle par present.js --- */
+  .deck {
+    position:absolute; left:50%; top:50%;
+    width:1280px; height:720px;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+    will-change:transform;
+  }
+
+  /* --- slides empilées, une seule visible (fondu + léger dolly) --- */
+  .deck .slide {
+    position:absolute; inset:0; margin:0;
+    box-shadow:none; border-radius:0;
+    opacity:0; visibility:hidden;
+    transition:opacity 1s cubic-bezier(.4,0,.2,1), visibility 0s linear 1s;
+    pointer-events:none;
+  }
+  .deck .slide.is-active {
+    opacity:1; visibility:visible; z-index:2;
+    transition:opacity 1s cubic-bezier(.4,0,.2,1), visibility 0s;
+    pointer-events:auto;
+    animation:lpzDolly 1.3s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  /* =======================================================================
+     KEYFRAMES
+     ======================================================================= */
+  @keyframes lpzDolly  { from{transform:scale(1.05)} to{transform:scale(1)} }
+  /* texte : monte + se dévoile par le bas (effet rideau) */
+  @keyframes lpzRise   { from{opacity:0; transform:translateY(32px); clip-path:inset(0 0 100% 0)}
+                         55% {opacity:1}
+                         to  {opacity:1; transform:translateY(0); clip-path:inset(0 0 -10% 0)} }
+  @keyframes lpzFade   { from{opacity:0} to{opacity:1} }
+  @keyframes lpzNum    { from{opacity:0; transform:translateY(18px) scale(.86)} to{opacity:1; transform:translateY(0) scale(1)} }
+  @keyframes lpzChip   { from{opacity:0; transform:translateY(16px) scale(.95)} to{opacity:1; transform:none} }
+  /* image : balayage de révélation (gauche→droite / droite→gauche) */
+  @keyframes lpzReveal { from{opacity:.1; clip-path:inset(0 0 0 100%)} to{opacity:1; clip-path:inset(0 0 0 0)} }
+  @keyframes lpzRevealR{ from{opacity:.1; clip-path:inset(0 100% 0 0)} to{opacity:1; clip-path:inset(0 0 0 0)} }
+  /* Ken Burns marqués + variés */
+  @keyframes lpzKbZoom { from{transform:scale(1.015)} to{transform:scale(1.13)} }
+  @keyframes lpzKbPan  { from{transform:scale(1.10) translateX(-2.6%)} to{transform:scale(1.10) translateX(2.6%)} }
+  @keyframes lpzKbPanR { from{transform:scale(1.10) translateX(2.6%)} to{transform:scale(1.10) translateX(-2.6%)} }
+  @keyframes lpzKbUp   { from{transform:scale(1.10) translateY(2.4%)} to{transform:scale(1.10) translateY(-2.4%)} }
+  /* accents */
+  @keyframes lpzCartouche { 0%{opacity:0; transform:translate(-50%,-50%) scale(.80)}
+                            62%{opacity:1; transform:translate(-50%,-50%) scale(1.06)}
+                            100%{opacity:1; transform:translate(-50%,-50%) scale(1)} }
+  @keyframes lpzSeam   { from{transform:scaleY(0)} to{transform:scaleY(1)} }
+  @keyframes lpzLine   { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+  @keyframes lpzCell   { from{opacity:0; transform:scale(1.06); clip-path:inset(10%)} to{opacity:1; transform:scale(1); clip-path:inset(0)} }
+  @keyframes lpzSheen  { from{transform:translateX(-130%)} to{transform:translateX(130%)} }
+  @keyframes lpzSheenR { from{transform:translateX(130%)} to{transform:translateX(-130%)} }
+
+  /* =======================================================================
+     TEXTE — révélation au masque, en cascade
+     ======================================================================= */
+  .deck .slide.is-active .title-panel  > *,
+  .deck .slide.is-active .split-text   > *,
+  .deck .slide.is-active .fullbleed-text > *,
+  .deck .slide.is-active .cz--title    > * {
+    animation:lpzRise .95s cubic-bezier(.22,1,.36,1) both;
+  }
+  /* on délègue la cascade fine aux items pour ces conteneurs */
+  .deck .slide.is-active .split-text > .promise-list,
+  .deck .slide.is-active .split-text > .locstats,
+  .deck .slide.is-active .split-text > .promise-pictos { animation:none; }
+
+  .deck .slide.is-active .title-panel  > *:nth-child(1),
+  .deck .slide.is-active .split-text   > *:nth-child(1),
+  .deck .slide.is-active .fullbleed-text > *:nth-child(1),
+  .deck .slide.is-active .cz--title    > *:nth-child(1){ animation-delay:.14s }
+  .deck .slide.is-active .title-panel  > *:nth-child(2),
+  .deck .slide.is-active .split-text   > *:nth-child(2),
+  .deck .slide.is-active .fullbleed-text > *:nth-child(2),
+  .deck .slide.is-active .cz--title    > *:nth-child(2){ animation-delay:.28s }
+  .deck .slide.is-active .title-panel  > *:nth-child(3),
+  .deck .slide.is-active .split-text   > *:nth-child(3),
+  .deck .slide.is-active .fullbleed-text > *:nth-child(3),
+  .deck .slide.is-active .cz--title    > *:nth-child(3){ animation-delay:.42s }
+  .deck .slide.is-active .title-panel  > *:nth-child(4),
+  .deck .slide.is-active .split-text   > *:nth-child(4),
+  .deck .slide.is-active .fullbleed-text > *:nth-child(4),
+  .deck .slide.is-active .cz--title    > *:nth-child(4){ animation-delay:.56s }
+  .deck .slide.is-active .title-panel  > *:nth-child(5),
+  .deck .slide.is-active .split-text   > *:nth-child(5),
+  .deck .slide.is-active .fullbleed-text > *:nth-child(5){ animation-delay:.70s }
+  .deck .slide.is-active .fullbleed-text > *:nth-child(6){ animation-delay:.84s }
+
+  /* listes / chips / pictos : cascade item par item */
+  .deck .slide.is-active .promise-list li   { animation:lpzRise .8s cubic-bezier(.22,1,.36,1) both; }
+  .deck .slide.is-active .promise-list li:nth-child(1){ animation-delay:.42s }
+  .deck .slide.is-active .promise-list li:nth-child(2){ animation-delay:.52s }
+  .deck .slide.is-active .promise-list li:nth-child(3){ animation-delay:.62s }
+  .deck .slide.is-active .promise-list li:nth-child(4){ animation-delay:.72s }
+  .deck .slide.is-active .promise-list li:nth-child(5){ animation-delay:.82s }
+
+  .deck .slide.is-active .locstats .chip    { animation:lpzChip .7s cubic-bezier(.22,1,.36,1) both; }
+  .deck .slide.is-active .locstats .chip:nth-child(1){ animation-delay:.50s }
+  .deck .slide.is-active .locstats .chip:nth-child(2){ animation-delay:.60s }
+  .deck .slide.is-active .locstats .chip:nth-child(3){ animation-delay:.70s }
+  .deck .slide.is-active .locstats .chip:nth-child(4){ animation-delay:.80s }
+  .deck .slide.is-active .locstats .chip:nth-child(5){ animation-delay:.90s }
+
+  .deck .slide.is-active .promise-pictos figure { animation:lpzChip .8s cubic-bezier(.22,1,.36,1) both; }
+  .deck .slide.is-active .promise-pictos figure:nth-child(1){ animation-delay:.62s }
+  .deck .slide.is-active .promise-pictos figure:nth-child(2){ animation-delay:.74s }
+  .deck .slide.is-active .promise-pictos figure:nth-child(3){ animation-delay:.86s }
+
+  /* =======================================================================
+     CHIFFRES — pop (le count-up est posé par present.js)
+     ======================================================================= */
+  .deck .slide.is-active .cz--stats .st-num,
+  .deck .slide.is-active .cz--stats .czpt-t,
+  .deck .slide.is-active .fact-num {
+    animation:lpzNum .85s .32s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  /* =======================================================================
+     IMAGES — balayage de révélation + Ken Burns (variés, RTL miroité)
+     ======================================================================= */
+  .deck .slide.is-active .title-photo   > img { animation:lpzReveal 1.1s cubic-bezier(.22,1,.36,1) both, lpzKbPan 13s ease-out both; }
+  .deck .slide.is-active .promise-media > img.img-top { animation:lpzReveal .95s cubic-bezier(.22,1,.36,1) both, lpzKbUp 12s ease-out both; }
+  .deck .slide.is-active .promise-media > img.img-bot { animation:lpzRevealR .95s cubic-bezier(.22,1,.36,1) both, lpzKbZoom 12s ease-out both; }
+  .deck .slide.is-active .split-media   > img { animation:lpzReveal 1s cubic-bezier(.22,1,.36,1) both, lpzKbZoom 13s ease-out both; }
+  .deck .slide--fullbleed.is-active .fullbleed-img { animation:lpzReveal 1.2s cubic-bezier(.22,1,.36,1) both, lpzKbPan 14s ease-out both; }
+  .deck .slide--collage.is-active .cz > img { animation:lpzKbZoom 14s ease-out both; }
+
+  [dir=rtl] .deck .slide.is-active .title-photo > img { animation:lpzRevealR 1.1s cubic-bezier(.22,1,.36,1) both, lpzKbPanR 13s ease-out both; }
+  [dir=rtl] .deck .slide.is-active .split-media > img { animation:lpzRevealR 1s cubic-bezier(.22,1,.36,1) both, lpzKbZoom 13s ease-out both; }
+  [dir=rtl] .deck .slide--fullbleed.is-active .fullbleed-img { animation:lpzRevealR 1.2s cubic-bezier(.22,1,.36,1) both, lpzKbPanR 14s ease-out both; }
+
+  /* =======================================================================
+     COLLAGE — les cellules s'ouvrent en cascade
+     ======================================================================= */
+  .deck .slide--collage.is-active .cz { animation:lpzCell .8s cubic-bezier(.22,1,.36,1) both; }
+  .deck .slide--collage.is-active .cz:nth-child(1){ animation-delay:.05s }
+  .deck .slide--collage.is-active .cz:nth-child(2){ animation-delay:.14s }
+  .deck .slide--collage.is-active .cz:nth-child(3){ animation-delay:.23s }
+  .deck .slide--collage.is-active .cz:nth-child(4){ animation-delay:.32s }
+  .deck .slide--collage.is-active .cz:nth-child(5){ animation-delay:.41s }
+  .deck .slide--collage.is-active .cz:nth-child(6){ animation-delay:.50s }
+
+  /* =======================================================================
+     ACCENTS — filets qui se tracent, cartouche à rebond, reflet doré
+     ======================================================================= */
+  /* filet or vertical (séparateur média) : se trace de haut en bas */
+  .deck .slide.is-active .title-photo::before,
+  .deck .slide.is-active .split-media::before,
+  .deck .slide.is-active .promise-media::before { animation:lpzSeam .7s .25s cubic-bezier(.22,1,.36,1) both; transform-origin:top; }
+
+  /* filets du losange de couverture : s'étirent vers l'extérieur */
+  .deck .slide.is-active .divider::before { animation:lpzLine .7s .35s cubic-bezier(.22,1,.36,1) both; transform-origin:right; }
+  .deck .slide.is-active .divider::after  { animation:lpzLine .7s .35s cubic-bezier(.22,1,.36,1) both; transform-origin:left; }
+  .deck .slide.is-active .divider i       { animation:lpzNum .6s .5s cubic-bezier(.34,1.56,.64,1) both; }
+
+  /* cartouche centrale : apparition à rebond */
+  .deck .slide.is-active .promise-cartouche { animation:lpzCartouche 1s .55s cubic-bezier(.34,1.56,.64,1) both; }
+
+  /* reflet doré qui balaie les visuels héros (une fois) */
+  .title-photo::after,
+  .slide--fullbleed::after {
+    content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:linear-gradient(105deg, transparent 38%, rgba(255,247,228,.22) 50%, transparent 62%);
+    transform:translateX(-130%); opacity:0;
+  }
+  .deck .slide.is-active .title-photo::after,
+  .deck .slide--fullbleed.is-active::after { opacity:1; animation:lpzSheen 1.5s .55s ease-out both; }
+  [dir=rtl] .deck .slide.is-active .title-photo::after,
+  [dir=rtl] .deck .slide--fullbleed.is-active::after { animation-name:lpzSheenR; }
+
+  /* badges, légendes, watermark : fondu différé */
+  .deck .slide.is-active .snum,
+  .deck .slide.is-active .legal,
+  .deck .slide.is-active .czcap,
+  .deck .slide.is-active .cz-src,
+  .deck .slide.is-active .fullbleed-watermark { animation:lpzFade 1s .5s both; }
+
+  /* =======================================================================
+     UI discrète (barre de progression + points), auto-masquée
+     ======================================================================= */
+  .lpz-ui { position:fixed; left:0; right:0; bottom:0; z-index:50; pointer-events:none;
+    transition:opacity .5s ease; }
+  body.ui-hide .lpz-ui { opacity:0; }
+
+  .lpz-progress { position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(235,218,187,.14); }
+  .lpz-progress > i { display:block; height:100%; width:0;
+    background:linear-gradient(90deg,#B8A684 0%,#EBDABB 100%); box-shadow:0 0 10px rgba(235,218,187,.45); }
+
+  .lpz-dots { position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+    display:flex; gap:9px; align-items:center; }
+  .lpz-dots button { width:7px; height:7px; padding:0; border:0; border-radius:50%;
+    background:rgba(244,241,234,.32); cursor:pointer; pointer-events:auto;
+    transition:transform .25s ease, background .25s ease; }
+  .lpz-dots button:hover { background:rgba(244,241,234,.6); }
+  .lpz-dots button.on { background:#EBDABB; transform:scale(1.4); }
+
+  /* badge pause (coin haut-gauche, RTL → haut-droit) */
+  .lpz-pause { position:fixed; top:18px; left:18px; z-index:51; opacity:0;
+    color:#EBDABB; font:600 11px/1 'Inter',system-ui,sans-serif; letter-spacing:.22em;
+    text-transform:uppercase; transition:opacity .3s ease; pointer-events:none; }
+  [dir=rtl] .lpz-pause { left:auto; right:18px; }
+  body.is-paused .lpz-pause { opacity:.9; }
+
+  /* aide-mémoire raccourcis (fade après quelques secondes) */
+  .lpz-hint { position:fixed; bottom:20px; right:22px; z-index:51;
+    color:rgba(244,241,234,.78); font:500 11.5px/1.5 'Inter',system-ui,sans-serif; letter-spacing:.02em;
+    text-align:right; pointer-events:none; transition:opacity 1s ease; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+  [dir=rtl] .lpz-hint { right:auto; left:22px; text-align:left; }
+  body.hint-gone .lpz-hint { opacity:0; }
+
+  /* respect des préférences système : coupe le mouvement appuyé */
+  @media (prefers-reduced-motion:reduce) {
+    .deck .slide.is-active *,
+    .deck .slide.is-active { animation-duration:.5s !important; animation-name:lpzFade !important; }
+  }
+}
